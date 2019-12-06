@@ -1,5 +1,4 @@
 defmodule Count do
-  def current_count() do
-    0
-  end
+  alias Count.Api
+  defdelegate current_count(), to: Api
 end
