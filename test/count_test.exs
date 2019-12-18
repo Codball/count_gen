@@ -16,7 +16,6 @@ defmodule CountTest do
     assert current_count == 0
   end
 
-
   test "reset count to 0" do
     Count.reset_count()
     current_count = Count.current_count()

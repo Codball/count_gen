@@ -1,8 +1,10 @@
 defmodule Count.Worker do
   use GenServer
 
+  alias Count.Strategy
+
   def init(_args) do
-    {:ok, 0}
+    {:ok, Strategy.initial_state()}
   end
 
   def start_link(opts) do
@@ -14,11 +16,10 @@ defmodule Count.Worker do
   end
 
   def handle_call(:reset_count, _from, state) do
-    {:reply, state, 0}
+    {:reply, state, Strategy.initial_state()}
   end
 
   def handle_cast(:increment, state) do
-    new_state = state + 1
-    {:noreply, new_state}
+    {:noreply, Strategy.increment_one(state)}
   end
 end
