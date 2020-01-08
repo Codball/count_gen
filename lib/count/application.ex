@@ -6,8 +6,15 @@ defmodule Count.Application do
   use Application
 
   def start(_type, _args) do
+    topologies = [
+      counter_cluster: [
+        strategy: Cluster.Strategy.Gossip
+      ]
+    ]
+
     children = [
       # Starts a worker by calling: Count.Worker.start_link(arg)
+      {Cluster.Supervisor, [topologies, [name: Counter.ClusterSupervisor]]},
       {Count.Worker, nil}
     ]
 
