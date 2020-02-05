@@ -42,4 +42,40 @@ defmodule CountRDTCounterTest do
 
     assert result == expected
   end
+
+  test "current count" do
+    init =
+      {Count.CRDTCounter.identity(),
+       %{
+         Count.CRDTCounter.identity() => %{count: 2},
+         :nathan => %{count: 4},
+         :rj => %{count: 6},
+         :node4 => %{count: 8}
+       }}
+
+    assert Count.CRDTCounter.current_count(init) == 20
+  end
+
+  test "update current node with other node value" do
+    init =
+      {Count.CRDTCounter.identity(),
+       %{
+         Count.CRDTCounter.identity() => %{count: 2},
+         :node2 => %{count: 10},
+       }}
+
+    nodes = %{
+      Count.CRDTCounter.identity() => %{count: 0},
+      :node2 => %{count: 4},
+      :node3 => %{count: 6}
+    }
+
+    node = Count.CRDTCounter.join(init, nodes)
+
+    assert Count.CRDTCounter.current_count(node) == 18
+  end
+
+  test "reset" do
+    
+  end
 end
