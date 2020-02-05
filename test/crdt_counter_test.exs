@@ -7,7 +7,7 @@ defmodule CountRDTCounterTest do
   end
 
   test "init" do
-    init = {Count.CRDTCounter.identity(), %{Count.CRDTCounter.identity() => %{count: 0}}}
+    init = {Count.CRDTCounter.identity(), %{Count.CRDTCounter.identity() => %{count: 0, version: 1}}}
     assert Count.CRDTCounter.init() == init
   end
 
@@ -61,7 +61,7 @@ defmodule CountRDTCounterTest do
       {Count.CRDTCounter.identity(),
        %{
          Count.CRDTCounter.identity() => %{count: 2},
-         :node2 => %{count: 10},
+         :node2 => %{count: 10}
        }}
 
     nodes = %{
@@ -76,6 +76,17 @@ defmodule CountRDTCounterTest do
   end
 
   test "reset" do
-    
+    init =
+      {Count.CRDTCounter.identity(),
+       %{
+         Count.CRDTCounter.identity() => %{count: 2, version: 1},
+         :node2 => %{count: 10, version: 1},
+         :node3 => %{count: 90, version: 1},
+         :node4 => %{count: 42, version: 1}
+       }}
+
+    node = Count.CRDTCounter.reset(init, 10)
+
+    assert Count.CRDTCounter.current_count(node) == 10
   end
 end

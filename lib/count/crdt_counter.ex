@@ -4,7 +4,7 @@ defmodule Count.CRDTCounter do
   end
 
   def init do
-    {identity(), %{identity() => %{count: 0}}}
+    {identity(), %{identity() => %{count: 0, version: 1}}}
   end
 
   def increment({identity, state}) do
@@ -21,7 +21,7 @@ defmodule Count.CRDTCounter do
   end
 
   def join({identity, state}, nodes) do
-    keys = (Map.keys(state) ++ Map.keys(nodes)) |> Enum.uniq() |> IO.inspect()
+    keys = (Map.keys(state) ++ Map.keys(nodes)) |> Enum.uniq()
 
     values =
       Enum.map(keys, fn node ->
@@ -37,7 +37,20 @@ defmodule Count.CRDTCounter do
     {identity, values}
   end
 
-  def reset({identity, state}) do
+  def reset({identity, state}, number) do
+    %{version: version} = Map.get(state, identity)
 
+    reset =
+      Enum.map(state, fn {node, %{version: version} = count} ->
+        if node != identity do
+          {node, %{count: 0, version: version + 1}}
+        else
+          {node, count}
+        end
+      end)
+      |> Map.new()
+
+    new_state = Map.put(reset, identity, %{count: number, version: version + 1})
+    {identity, new_state}
   end
 end
